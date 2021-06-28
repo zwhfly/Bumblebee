@@ -481,8 +481,7 @@ int main(int argc, char* argv[]) {
     if (!pci_id_igd) {
       /* Ok, this is not a double gpu setup supported (there is at most
          one nvidia and no intel cards */
-      bb_log(LOG_ERR, "No integrated video card found, quitting.\n");
-      return (EXIT_FAILURE);
+      bb_log(LOG_DEBUG, "No integrated video card found, continue anyway.\n");
     }
   }
   pci_bus_id_discrete = pci_find_gfx_by_vendor(PCI_VENDOR_ID_NVIDIA, 0);
@@ -492,9 +491,11 @@ int main(int argc, char* argv[]) {
   }
 
   bb_log(LOG_DEBUG, "Found card: %02x:%02x.%x (discrete)\n", pci_bus_id_discrete->bus, pci_bus_id_discrete->slot, pci_bus_id_discrete->func);
-  bb_log(LOG_DEBUG, "Found card: %02x:%02x.%x (integrated)\n", pci_id_igd->bus, pci_id_igd->slot, pci_id_igd->func);
-
-  free(pci_id_igd);
+  if (pci_id_igd)
+  {
+    bb_log(LOG_DEBUG, "Found card: %02x:%02x.%x (integrated)\n", pci_id_igd->bus, pci_id_igd->slot, pci_id_igd->func);
+    free(pci_id_igd);
+  }
 
   // kmod context have to be available for driver detection
   bb_status.kmod_ctx = kmod_new(NULL, NULL);
